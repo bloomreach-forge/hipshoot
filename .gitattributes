@@ -1,1 +1,4 @@
 * text=auto !eol
+maven/pom.xml -text
+/pom.xml -text
+src/site/site.xml -text
