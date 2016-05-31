@@ -21,10 +21,47 @@
 
   <name>hipshoot Maven Plugin</name>
   <description>hipshoot Maven Plugin</description>
-  <artifactId>hipshoot-maven</artifactId>
+  <artifactId>hipshoot-maven-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
 
   <dependencies>
 
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-script-ant</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant-jsch</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch</artifactId>
+    </dependency>
+
   </dependencies>
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>${maven-plugin-plugin.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-tools-ant</artifactId>
+            <version>${maven-plugin-tools-ant.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+    </plugins>
+
+  </build>
 
 </project>

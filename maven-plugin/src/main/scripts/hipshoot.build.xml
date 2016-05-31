@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2016 Hippo
+
+  Licensed under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with the
+  License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software distributed
+  under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+  OR CONDITIONS OF ANY KIND, either express or implied. See the License for
+  the specific language governing permissions and limitations under the License.
+-->
+<project>
+
+  <target name="help">
+    <echo message="Hipshoot help...." />
+  </target>
+
+  <target name="tomcat-install">
+    <echo message="Installing Tomcat ..." />
+
+    <echo file="target/tomcat-install.sh">
+cd /tmp
+wget http://apache.mirrors.pair.com/tomcat/tomcat-8/v8.0.35/bin/apache-tomcat-8.0.35.tar.gz
+cd /usr/local
+sudo tar xvfz /tmp/apache-tomcat-8.0.35.tar.gz
+rm /tmp/apache-tomcat-8.0.35.tar.gz
+sudo ln -s /usr/local/apache-tomcat-8.0.35 /usr/local/tomcat
+    </echo>
+
+    <sshexec host="server1"
+             username="cms" password="cms"
+             commandResource="target/tomcat-install.sh" />
+
+    <echo file="target/catalina-base-init.sh">
+cd /opt/cms
+mkdir tomcat
+mkdir tomcat/bin
+    </echo>
+
+    <sshexec host="server1"
+             username="cms" password="cms"
+             commandResource="target/catalina-base-init.sh" />
+
+  </target>
+
+  <target name="tomcat-start">
+    <echo message="Starting Tomcat ..." />
+    <sshexec host="server1"
+             username="cms" password="cms"
+             command="serivce cms start" />
+  </target>
+
+  <target name="tomcat-stop">
+    <echo message="Stopping Tomcat ..." />
+    <sshexec host="server1"
+             username="cms" password="cms"
+             command="serivce cms stop" />
+  </target>
+
+  <target name="hippo-install">
+    <echo message="Installing Hippo ..." />
+    <scp file="target/*.tar.gz"
+         todir="cms@server1:/tmp" />
+    <sshexec host="server1"
+             username="cms" password="cms"
+             command="rm /tmp/*.tar.gz" />
+  </target>
+
+</project>

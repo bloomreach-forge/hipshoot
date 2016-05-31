@@ -1,4 +1,6 @@
 * text=auto !eol
-maven/pom.xml -text
+maven-plugin/pom.xml -text
+maven-plugin/src/main/scripts/hipshoot.build.xml -text svneol=unset#text/plain
+maven-plugin/src/main/scripts/hipshoot.mojos.xml -text svneol=unset#text/plain
 /pom.xml -text
 src/site/site.xml -text
