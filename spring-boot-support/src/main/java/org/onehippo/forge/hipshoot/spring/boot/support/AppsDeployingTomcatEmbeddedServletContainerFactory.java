@@ -41,20 +41,63 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
+/**
+ * An extension of {@link TomcatEmbeddedServletContainerFactory} that allows to deploy additional WARs
+ * located at <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>.
+ * <P>
+ * If an environment property, <code>hipshoot.embedded.catalina.wars</code>, is provided with a comma separated
+ * string for the war file names (e.g, <code>hipshoot.embedded.catalina.wars="site.war, cms.war"</code>), this
+ * will look up those war file resources under <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>,
+ * extract the war file resources to a local file system directory designated as local embedded tomcat webapps
+ * directory by another environment property, <code>hipshoot.embedded.catalina.appBase</code>, and add each war
+ * as web application context during the startup.
+ * </P>
+ * <P>
+ * This reads the following environment properties:
+ * </P>
+ * <UL>
+ *   <LI>
+ *     <CODE>hipshoot.embedded.catalina.base</CODE>:
+ *     The path of the local embedded tomcat base to override the default embedded tomcat base path.
+ *   </LI>
+ *   <LI>
+ *     <CODE>hipshoot.embedded.catalina.appBase</CODE>:
+ *     The path of the web application base path (i.e, <code>$CATALINA_BASE/webapps</code> folder)
+ *     where the additional war resources packaged in <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>
+ *     should be deployed onto.
+ *   </LI>
+ *   <LI>
+ *     <CODE>hipshoot.embedded.catalina.wars</CODE>:
+ *     Comma separated string for the packaged war file resource names under <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>.
+ *     e.g, <code>"site.war, cms.war"</code>.
+ *   </LI>
+ * </UL>
+ */
 public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedServletContainerFactory {
 
     private static Logger log = LoggerFactory.getLogger(AppsDeployingTomcatEmbeddedServletContainerFactory.class);
 
+    /**
+     * The classpath resource path under which war file resources will be looked up to deploy.
+     */
     private static final String EMBEDDED_CATALINA_WEBAPPS_PATH = "META-INF/hipshoot/embedded-catalina/webapps";
 
+    /**
+     * Default byte buffer size used when copying resources to files.
+     */
     private static final int BUFFER_SIZE = 4096;
 
+    /**
+     * Local web application base directory (i.e, webapps folder).
+     */
     private File appBaseDirectory;
 
-    public AppsDeployingTomcatEmbeddedServletContainerFactory(final Environment environment) {
+    /**
+     * Constructs with an {@link EmbeddedCatalinaConfiguration}.
+     * @param config {@link EmbeddedCatalinaConfiguration}
+     */
+    public AppsDeployingTomcatEmbeddedServletContainerFactory(final EmbeddedCatalinaConfiguration config) {
         super();
-
-        final EmbeddedCatalinaConfiguration config = new EmbeddedCatalinaConfiguration(environment);
 
         final String base = config.getBase();
 
@@ -84,6 +127,13 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <P>
+     * Overridden to scan the packaged war file resources and deploy those before startup.
+     * </P>
+     */
+    @Override
     protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(Tomcat tomcat) {
         try {
             String contextPath;
@@ -103,10 +153,18 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
         return super.getTomcatEmbeddedServletContainer(tomcat);
     }
 
+    /**
+     * Returns web application base directory (i.e, webapps directory) of the embedded tomcat.
+     * @return web application base directory (i.e, webapps directory) of the embedded tomcat
+     */
     protected File getAppBaseDirectory() {
         return appBaseDirectory;
     }
 
+    /**
+     * Sets web application base directory (i.e, webapps directory) of the embedded tomcat.
+     * @param appBaseDirectory web application base directory (i.e, webapps directory) of the embedded tomcat
+     */
     protected void setAppBaseDirectory(File appBaseDirectory) {
         this.appBaseDirectory = appBaseDirectory;
     }
