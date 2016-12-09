@@ -36,9 +36,14 @@ public class EmbeddedCatalinaConfiguration {
     private String wars;
 
     /**
-     * Flag whether or not persist session.
+     * Flag whether or not persist session is enabled.
      */
     private boolean persistSession;
+
+    /**
+     * Flag whether or not JNDI is enabled.
+     */
+    private boolean namingEnabled = true;
 
     /**
      * Default constructor.
@@ -102,6 +107,22 @@ public class EmbeddedCatalinaConfiguration {
      */
     public void setPersistSession(boolean persistSession) {
         this.persistSession = persistSession;
+    }
+
+    /**
+     * Returns true if JNDI is turned on.
+     * @return true if JNDI is turned on
+     */
+    public boolean isNamingEnabled() {
+        return namingEnabled;
+    }
+
+    /**
+     * Sets flag whether or not JNDI is turned on.
+     * @param namingEnabled flag whether or not JNDI is turned on
+     */
+    public void setNamingEnabled(boolean namingEnabled) {
+        this.namingEnabled = namingEnabled;
     }
 
 }

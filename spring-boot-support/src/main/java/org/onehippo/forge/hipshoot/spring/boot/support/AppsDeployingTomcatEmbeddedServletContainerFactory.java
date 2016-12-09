@@ -25,8 +25,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -54,7 +56,7 @@ import org.springframework.util.StringUtils;
  * as web application context during the startup.
  * </P>
  * <P>
- * This reads the following environment properties:
+ * This reads the environment properties like the following:
  * </P>
  * <UL>
  *   <LI>
@@ -69,6 +71,9 @@ import org.springframework.util.StringUtils;
  *     e.g, <code>"site.war, cms.war"</code>.
  *   </LI>
  * </UL>
+ * <P>
+ * Please see {@link EmbeddedCatalinaConfiguration} for a full list of the available properties.
+ * </P>
  */
 public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedServletContainerFactory {
 
@@ -90,11 +95,23 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
     private File appBaseDirectory;
 
     /**
-     * Constructs with an {@link EmbeddedCatalinaConfiguration}.
-     * @param config {@link EmbeddedCatalinaConfiguration}
+     * {@link Tomcat} customizers.
      */
-    public AppsDeployingTomcatEmbeddedServletContainerFactory(final EmbeddedCatalinaConfiguration config) {
+    private List<TomcatCustomizer> tomcatCustomizers = new ArrayList<>();
+
+    /**
+     * Embedded tomcat configuration.
+     */
+    private final EmbeddedCatalinaConfiguration config;
+
+    /**
+     * Constructs with an {@link EmbeddedCatalinaConfiguration}.
+     * @param catalinaConfig {@link EmbeddedCatalinaConfiguration}
+     */
+    public AppsDeployingTomcatEmbeddedServletContainerFactory(final EmbeddedCatalinaConfiguration catalinaConfig) {
         super();
+
+        this.config = catalinaConfig;
 
         setPersistSession(config.isPersistSession());
 
@@ -115,6 +132,14 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
     }
 
     /**
+     * Add a {@link Tomcat} customizer.
+     * @param tomcatCustomizer {@link Tomcat} customizer
+     */
+    public void addTomcatCustomizers(TomcatCustomizer tomcatCustomizer) {
+        tomcatCustomizers.add(tomcatCustomizer);
+    }
+
+    /**
      * {@inheritDoc}
      * <P>
      * Overridden to scan the packaged war file resources and deploy those before startup.
@@ -123,6 +148,14 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
     @Override
     protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(Tomcat tomcat) {
         try {
+            for (TomcatCustomizer tomcatCustomizer : tomcatCustomizers) {
+                tomcatCustomizer.customize(tomcat);
+            }
+
+            if (config.isNamingEnabled()) {
+                tomcat.enableNaming();
+            }
+
             String contextPath;
             String basePath;
             Manager manager;
@@ -140,7 +173,9 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
                         manager = new StandardManager();
                         context.setManager(manager);
                     }
-                    ((StandardManager) manager).setPathname("");
+                    if (manager instanceof StandardManager) {
+                        ((StandardManager) manager).setPathname(null);
+                    }
                 }
             }
         } catch (ServletException ex) {
