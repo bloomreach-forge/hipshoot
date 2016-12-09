@@ -26,11 +26,6 @@ import org.springframework.core.env.Environment;
 public class EmbeddedCatalinaConfiguration {
 
     /**
-     * The base path of the embedded tomcat. i.e, <code>$CATALINA_BASE</code>.
-     */
-    private String base;
-
-    /**
      * The web application base directory path. i.e, <code>$CATALINA_BASE/webapps</code>.
      */
     private String appBase;
@@ -41,6 +36,11 @@ public class EmbeddedCatalinaConfiguration {
     private String wars;
 
     /**
+     * Flag whether or not persist session.
+     */
+    private boolean persistSession;
+
+    /**
      * Default constructor.
      */
     public EmbeddedCatalinaConfiguration() {
@@ -48,28 +48,12 @@ public class EmbeddedCatalinaConfiguration {
 
     /**
      * Constructs by passing an {@link Environment}, so this reads each property manually.
-     * @param env
+     * @param env an {@link Environment} to read each property manually
      */
     public EmbeddedCatalinaConfiguration(final Environment env) {
-        base = env.getProperty("hipshoot.embedded.catalina.base");
         appBase = env.getProperty("hipshoot.embedded.catalina.appBase");
         wars = env.getProperty("hipshoot.embedded.catalina.wars");
-    }
-
-    /**
-     * Returns the base path of the embedded tomcat. i.e, <code>$CATALINA_BASE</code>.
-     * @return the base path of the embedded tomcat. i.e, <code>$CATALINA_BASE</code>
-     */
-    public String getBase() {
-        return base;
-    }
-
-    /**
-     * Sets the base path of the embedded tomcat. i.e, <code>$CATALINA_BASE</code>.
-     * @param base the base path of the embedded tomcat. i.e, <code>$CATALINA_BASE</code>
-     */
-    public void setBase(String base) {
-        this.base = base;
+        persistSession = Boolean.parseBoolean(env.getProperty("hipshoot.embedded.catalina.persistSession"));
     }
 
     /**
@@ -102,6 +86,22 @@ public class EmbeddedCatalinaConfiguration {
      */
     public void setWars(String wars) {
         this.wars = wars;
+    }
+
+    /**
+     * Returns true if session persistence is turned on.
+     * @return true if session persistence is turned on
+     */
+    public boolean isPersistSession() {
+        return persistSession;
+    }
+
+    /**
+     * Sets flag whether or not session persistence is turned on.
+     * @param persistSession flag whether or not session persistence is turned on
+     */
+    public void setPersistSession(boolean persistSession) {
+        this.persistSession = persistSession;
     }
 
 }

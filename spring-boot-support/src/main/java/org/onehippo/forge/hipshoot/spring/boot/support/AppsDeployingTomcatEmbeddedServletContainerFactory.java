@@ -32,13 +32,14 @@ import java.util.Map;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Manager;
 import org.apache.catalina.loader.WebappLoader;
+import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.Tomcat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
 /**
@@ -56,10 +57,6 @@ import org.springframework.util.StringUtils;
  * This reads the following environment properties:
  * </P>
  * <UL>
- *   <LI>
- *     <CODE>hipshoot.embedded.catalina.base</CODE>:
- *     The path of the local embedded tomcat base to override the default embedded tomcat base path.
- *   </LI>
  *   <LI>
  *     <CODE>hipshoot.embedded.catalina.appBase</CODE>:
  *     The path of the web application base path (i.e, <code>$CATALINA_BASE/webapps</code> folder)
@@ -99,17 +96,7 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
     public AppsDeployingTomcatEmbeddedServletContainerFactory(final EmbeddedCatalinaConfiguration config) {
         super();
 
-        final String base = config.getBase();
-
-        if (base != null && !base.isEmpty()) {
-            File baseDir = new File(base);
-
-            if (!baseDir.isDirectory()) {
-                baseDir.mkdirs();
-            }
-
-            setBaseDirectory(baseDir);
-        }
+        setPersistSession(config.isPersistSession());
 
         final String appBase = config.getAppBase();
 
@@ -138,6 +125,7 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
         try {
             String contextPath;
             String basePath;
+            Manager manager;
 
             for (Map.Entry<String, String> entry : getWebappPathsMap().entrySet()) {
                 contextPath = entry.getKey();
@@ -145,6 +133,15 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
                 Context context = tomcat.addWebapp(contextPath, basePath);
                 WebappLoader webappLoader = new WebappLoader(Thread.currentThread().getContextClassLoader());
                 context.setLoader(webappLoader);
+
+                if (!isPersistSession()) {
+                    manager = context.getManager();
+                    if (manager == null) {
+                        manager = new StandardManager();
+                        context.setManager(manager);
+                    }
+                    ((StandardManager) manager).setPathname("");
+                }
             }
         } catch (ServletException ex) {
             throw new IllegalStateException("Failed to add webapp", ex);
