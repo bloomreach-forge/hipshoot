@@ -26,10 +26,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.javaVersion>1.7</project.build.javaVersion>
 
-    <maven-script-ant.version>2.2.1</maven-script-ant.version>
-    <ant-jsch.version>1.7.1</ant-jsch.version>
-    <jsch.version>0.1.53</jsch.version>
-
     <maven-plugin-plugin.version>3.4</maven-plugin-plugin.version>
     <maven-plugin-tools-ant.version>3.4</maven-plugin-tools-ant.version>
 
@@ -116,24 +112,6 @@
 
     <dependencies>
 
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-script-ant</artifactId>
-        <version>${maven-script-ant.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.ant</groupId>
-        <artifactId>ant-jsch</artifactId>
-        <version>${ant-jsch.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.jcraft</groupId>
-        <artifactId>jsch</artifactId>
-        <version>${jsch.version}</version>
-      </dependency>
-
     </dependencies>
 
   </dependencyManagement>
@@ -195,7 +173,7 @@
   </reporting>
 
   <modules>
-    <module>maven-plugin</module>
+    <module>spring-boot-support</module>
   </modules>
 
   <build>

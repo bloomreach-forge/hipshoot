@@ -26,7 +26,7 @@
 
     <menu name="Main">
       <item name="Welcome" href="index.html" />
-      <item name="hipshoot Maven Plugin" href="maven/index.html">
+      <item name="Spring Boot Support" href="spring-boot-support/index.html">
         <item name="Installation" href="maven/install.html" />
         <item name="Javadoc (latest)" href="apidocs/index.html" />
       </item>
