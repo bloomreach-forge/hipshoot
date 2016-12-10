@@ -42,35 +42,10 @@
       <!-- SNIP -->
 
     </repositories>
-
-    <!-- SNIP -->
-
-    <dependencyManagement>
-
-      <!-- SNIP -->
-
-      <dependencies>
-
-        <!-- SNIP -->
-
-        <!-- NOTE: You should set a property named 'forge.hipshoot.version' to a version of this plugin! -->
-        <dependency>
-          <groupId>org.onehippo.forge.hipshoot</groupId>
-          <artifactId>hipshoot-spring-boot-support</artifactId>
-          <version>${forge.hipshoot.version}</version>
-        </dependency>
-
-        <!-- SNIP -->
-
-      </dependencies>
-
-      <!-- SNIP -->
-
-    </dependencyManagement>
     ]]></source>
         </div>
         <p>
-          And add the following dependency reference into your Spring Boot Deployment module (sub)project.
+          And add the following dependency into your Spring Boot (Deployment) module (sub)project.
         </p>
         <div class="brush: xml">
           <source><![CDATA[
@@ -78,9 +53,11 @@
 
       <!-- SNIP -->
 
+      <!-- NOTE: You should set a property named 'forge.hipshoot.version' to a version of this plugin! -->
       <dependency>
         <groupId>org.onehippo.forge.hipshoot</groupId>
         <artifactId>hipshoot-spring-boot-support</artifactId>
+        <version>${forge.hipshoot.version}</version>
       </dependency>
 
       <!-- SNIP -->

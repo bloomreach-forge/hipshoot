@@ -25,8 +25,371 @@
     <section name="hipshoot Spring Boot Support">
       <subsection name="Introduction">
         <p>
-          TODO
+          This library provides the following components to support or extend
+          <a href="https://projects.spring.io/spring-boot/">Spring Boot Framework</a>.
         </p>
+        <table>
+          <tr>
+            <th>Component</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td><a href="../../apidocs/org/onehippo/forge/hipshoot/spring/boot/support/AppsDeployingTomcatEmbeddedServletContainerFactory.html">AppsDeployingTomcatEmbeddedServletContainerFactory</a></td>
+            <td>
+              <p>
+                An extension of <a href="http://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/embedded/tomcat/TomcatEmbeddedServletContainerFactory.html">TomcatEmbeddedServletContainerFactory</a>
+                to be able to deploy additional WARs packaged at <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>.
+              </p>
+              <p>
+                If an environment property, <code>hipshoot.embedded.catalina.wars</code>, is provided with a comma separated
+                string for the war file names (e.g, <code>hipshoot.embedded.catalina.wars="site.war, cms.war"</code>), this
+                will look up those war file resources under <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>,
+                extract the war file resources to a local file system directory designated as local embedded tomcat webapps
+                directory by another environment property, <code>hipshoot.embedded.catalina.appBase</code>, and add each war
+                as web application context during the startup.
+              </p>
+              <p>
+                Please see <a href="../../apidocs/org/onehippo/forge/hipshoot/spring/boot/support/config/embedded/CatalinaConfiguration.html">CatalinaConfiguration</a>
+                for a full list of the available configuration properties.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </subsection>
+      <subsection name="About AppsDeployingTomcatEmbeddedServletContainerFactory">
+        <p>
+          By default, <a href="http://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/embedded/tomcat/TomcatEmbeddedServletContainerFactory.html">TomcatEmbeddedServletContainerFactory</a>
+          does not provide some options to customize the embedded Tomcat server.
+          For example, it doesn't allow to deploy additional web applications. It starts up only with single web applicaiton, by default.
+          You are supposed to code somethings to customize the embedded Tomcat server manually in many cases.
+          This might be okay in simple applications, but not convenient for multi-wars-based application such as Hippo CMS
+          in which a content delivery application (e.g, <code>site.war</code>) and a content authoring application (e.g, <code>cms.war</code>)
+          are deployed in most cases.
+        </p>
+        <p>
+          <a href="../../apidocs/org/onehippo/forge/hipshoot/spring/boot/support/AppsDeployingTomcatEmbeddedServletContainerFactory.html">AppsDeployingTomcatEmbeddedServletContainerFactory</a>
+          extends <a href="http://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/embedded/tomcat/TomcatEmbeddedServletContainerFactory.html">TomcatEmbeddedServletContainerFactory</a>
+          to customize the embedded Tomcat server by following the recommendation in Spring Boot online documentation:
+          <a href="http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-developing-web-applications.html#boot-features-customizing-configurableembeddedservletcontainerfactory-directly">Customizing ConfigurableEmbeddedServletContainer directly</a>.
+        </p>
+      </subsection>
+      <subsection name="How to use AppsDeployingTomcatEmbeddedServletContainerFactory">
+        <p>
+          Here's a simple Spring Boot Application class example:
+        </p>
+        <div class="brush: java">
+        <source><![CDATA[
+@Configuration
+@SpringBootApplication
+// To auto-scan org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaConfiguration bean
+// that reads all the configuration properties (from application.yaml or application.properties for example).
+@ComponentScan(basePackages = { "org.onehippo.forge.hipshoot.spring.boot.support.config.embedded" })
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+    /**
+     * Embedded tomcat configuration to pass to AppsDeployingTomcatEmbeddedServletContainerFactory
+     */
+    @Autowired
+    private CatalinaConfiguration catalinaConfiguration;
+
+    @Bean
+    public EmbeddedServletContainerFactory servletContainerFactory() {
+        // Instead of TomcatEmbeddedServletContainerFactory, return an AppsDeployingTomcatEmbeddedServletContainerFactory here.
+        return new AppsDeployingTomcatEmbeddedServletContainerFactory(catalinaConfiguration);
+    }
+}
+        ]]></source>
+        </div>
+        <p>
+          The <code>#servletContainerFactory()</code> method simply follows the customization example explained in the section,
+          <a href="http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-developing-web-applications.html#boot-features-customizing-configurableembeddedservletcontainerfactory-directly">Customizing ConfigurableEmbeddedServletContainer directly</a>.
+        </p>
+        <p>
+          Now, <code>AppsDeployingTomcatEmbeddedServletContainerFactory</code> will read all the configuration properties
+          under <code>hipshoot.embedded.catalina</code> prefix (see the example configuration below),
+          and do some extra work such as deploying additional wars as separate contexts,
+          enabling JNDI naming, registering JNDI resources, etc.
+        </p>
+        <div class="brush: javascript">
+        <source><![CDATA[
+# spring-boot-deploy/src/main/resources/application.yaml
+
+logging:
+    level:
+        root: 'WARN'
+        org.springframework.boot: 'INFO'
+        org.onehippo.forge.hipshoot.spring.boot.support: 'INFO'
+        org.hippoecm.hst.core.container.DiagnosticReportingValve: 'INFO'
+        freemarker.servlet: 'FATAL'
+        org.apache.wicket.Localizer: 'ERROR'
+        org.hippoecm.repository.jackrabbit.persistence: 'INFO'
+        org.hippoecm.repository.updater: 'INFO'
+        org.apache.jackrabbit.core.persistence.bundle: 'INFO'
+        org.apache.jackrabbit.core.state: 'ERROR'
+        org.apache.jackrabbit.core.ItemManager: 'ERROR'
+        org.apache.jackrabbit.core.persistence.bundle.util.LRUNodeIdCache: 'ERROR'
+
+server:
+    tomcat:
+        basedir: 'target/embedded-tomcat'
+
+hipshoot:
+    embedded:
+        catalina:
+            namingEnabled: 'true'
+            persistSession: 'false'
+            appBase: '${server.tomcat.basedir}/webapps'
+            wars: 'cms.war, site.war'
+            server:
+                defaultContext:
+                    resources:
+                        cachingAllowed: 'true'
+                        cacheMaxSize: '40960'
+                globalNamingResources:
+                    - name: 'mail/Session'
+                      auth: 'Container'
+                      type: 'javax.mail.Session'
+                      propertiesString: 'mail.smtp.host=localhost, mail.smtp.port=2525'
+                    - name: 'jdbc/repositoryDS'
+                      auth: 'Container'
+                      type: 'javax.sql.DataSource'
+                      properties:
+                          driverClassName: 'org.hsqldb.jdbc.JDBCDriver'
+                          url: 'jdbc:hsqldb:mem:mymemdb'
+                          username: 'SA'
+                          password: ''
+                          initialSize: '2'
+                          maxTotal: '20'
+                          maxIdle: '10'
+                          minIdle: '2'
+                          maxWaitMillis: '10000'
+        ]]></source>
+        </div>
+      </subsection>
+      <subsection name="Deploying Additional WARs packages in the single executable JAR">
+        <p>
+          <code>AppsDeployingTomcatEmbeddedServletContainerFactory</code> reads <code>hipshoot.embedded.catalina.wars</code>
+          configuration property. And, if the property has a comma separated war file resource names
+          (e.g, <code>"site.war, cms.war"</code>), then it copies each war file resource from the single executable JAR file
+          (under <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>)
+          by using <code>Thread.currentThread().getContextClassloader().getResourceAsStream(String)</code>
+          in order to deploy it additionally on startup.
+          e.g, <code>Thread.currentThread().getContextClassloader().getResourceAsStream("META-INF/hipshoot/embedded-catalina/webapps/cms.war")</code>.
+        </p>
+      </subsection>
+      <subsection name="Packaging Additional WARs packages in the single executable JAR">
+        <p>
+          Let's suppose you have a normal Hippo project containing <code>site</code> and <code>cms</code> war modules.
+          Each maven submodule will create a war file under the <code>target</code> folder.
+        </p>
+        <p>
+          To wrap this Hippo project into a Spring Boot application, you can do the following as an example:
+        </p>
+        <ol>
+          <li>Add a submodule, <code>spring-boot-deploy</code>, under the root.</li>
+          <li>So, this submodule will inherit Hippo CMS Release parent pom basically.</li>
+          <li>Now, create a pom.xml in <code>spring-boot-deploy</code> module, setting parent to the root pom.</li>
+          <li>
+            Add Spring Boot Dependencies in <code>spring-boot-deploy</code> module as <code>import</code> scope.
+            (ref: <a href="http://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-maven-without-a-parent">Using Spring Boot without the parent POM</a>)
+          </li>
+          <li>
+            Package both <code>site.war</code> and <code>cms.war</code> into the jar output before the Spring Boot Repackaging task.
+            For example, we can execute <code>maven-resources-plugin:copy-resources</code> plugin in <code>prepare-package</code> Maven phase.
+            (See the example below.)
+          </li>
+          <li>
+            Configure the Spring Boot Repackage Maven plugin.
+            (You might want to configure <code>ZIP</code> layout in order to take advantage of the features of
+            <a href="http://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar-property-launcher-features">PropertiesLauncher</a>.)
+          </li>
+          <li>
+            Finally, you can execute the packaged single executable JAR file simply with <code>java</code> command,
+            or you can even use a specific platform tool (e.g, Cloud Foundry <code>cf</code> commands).
+          </li>
+        </ol>
+        <p>
+          Here's an example <code>pom.xml</code> of <code>spring-boot-deploy</code> submodule explained above:
+        </p>
+        <div class="brunsh: xml">
+        <source><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.example</groupId>
+    <artifactId>myhippoproject</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>myhippoproject-spring-boot-deploy</artifactId>
+  <packaging>jar</packaging>
+  <name>My Hippo Project Spring Boot Deploy</name>
+  <description>My Hippo Project Spring Boot Deploy</description>
+
+  <properties>
+    <java.version>1.8</java.version>
+    <spring-boot.version>1.4.2.RELEASE</spring-boot.version>
+    <tomcat.version>8.5.6</tomcat.version>
+    <forge.hipshoot.version>0.1.0</forge.hipshoot.version>
+  </properties>
+
+  <dependencyManagement>
+
+    <dependencies>
+
+      <!-- Import dependency management from Spring Boot -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+    </dependencies>
+
+  </dependencyManagement>
+
+  <dependencies>
+
+    <!-- Let this application be a spring boot web application simply. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- To provide commons-logging API implementation as Spring depends on commons-logging API. -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- To enable Tomcat DBCP2 DataSource JNDI Resource. -->
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-dbcp</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Just for testing JNDI DataSource creation. -->
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+    </dependency>
+
+    <!-- To use Spring Boot Extension components provided by hipshoot-spring-boot-support. -->
+    <dependency>
+      <groupId>org.onehippo.forge.hipshoot</groupId>
+      <artifactId>hipshoot-spring-boot-support</artifactId>
+      <version>${forge.hipshoot.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- For JSP/JSTL Support in the embedded tomcat. -->
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-el</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-jasper</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+
+    <finalName>myhippoproject-spring-boot-deploy</finalName>
+
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/META-INF/hipshoot/embedded-catalina/webapps</outputDirectory>
+              <resources>
+                <resource>
+                  <filtering>false</filtering>
+                  <directory>${basedir}/../cms/target</directory>
+                  <includes>
+                    <include>*.war</include>
+                  </includes>
+                </resource>
+                <resource>
+                  <filtering>false</filtering>
+                  <directory>${basedir}/../site/target</directory>
+                  <includes>
+                    <include>*.war</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <layout>ZIP</layout>
+          <executable>true</executable>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+</project>
+        ]]></source>
+        </div>
+      </subsection>
+      <subsection name="Building and Runing">
+        <p>
+          If you run <code>mvn clean package</code> in the project root folder,
+          it will build and package all the WARs (e.g, <code>site.war</code> and <code>cms.war</code>).
+          And, when it is building <code>spring-boot-deploy</code> submodule continously, it will add those war files
+          into <code>target/classes/META-INF/hipshoot/embedded-catalina/webapps/</code> folder first.
+          After building a normal JAR package file, the Spring Boot Maven plugin will repackage it to be self-executable.
+        </p>
+        <p>
+          So, you can execute the JAR like the following example:
+        </p>
+        <div class="brush: bash">
+        <source><![CDATA[
+$ java \
+    -Xms512m -Xmx1024m \
+    -Drepo.path="storage" \
+    -jar target/myhippoproject-spring-boot-deploy.jar
+        ]]></source>
+        </div>
       </subsection>
     </section>
   </body>

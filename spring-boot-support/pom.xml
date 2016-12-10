@@ -20,7 +20,7 @@
   </parent>
 
   <name>hipshoot Spring Boot Support</name>
-  <description>hipshoot Spring Boot Support</description>
+  <description>Spring Boot Support/Extension Component Library</description>
   <artifactId>hipshoot-spring-boot-support</artifactId>
 
   <dependencies>

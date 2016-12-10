@@ -36,7 +36,7 @@
     <section name="Release Notes">
       <subsection name="0.1.0">
         <ul>
-          <li>Initial release.</li>
+          <li>Initial release with Spring Boot support/extension components.</li>
         </ul>
       </subsection>
     </section>

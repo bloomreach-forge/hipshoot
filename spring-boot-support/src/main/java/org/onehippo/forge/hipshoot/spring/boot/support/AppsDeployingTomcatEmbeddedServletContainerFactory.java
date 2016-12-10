@@ -47,8 +47,8 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.util.StringUtils;
 
 /**
- * An extension of {@link TomcatEmbeddedServletContainerFactory} that allows to deploy additional WARs
- * located at <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>.
+ * An extension of {@link TomcatEmbeddedServletContainerFactory} to be able to deploy additional WARs
+ * packaged at <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>.
  * <P>
  * If an environment property, <code>hipshoot.embedded.catalina.wars</code>, is provided with a comma separated
  * string for the war file names (e.g, <code>hipshoot.embedded.catalina.wars="site.war, cms.war"</code>), this
