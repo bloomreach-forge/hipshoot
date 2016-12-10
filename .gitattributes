@@ -3,7 +3,6 @@
 spring-boot-support/pom.xml -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/AppsDeployingTomcatEmbeddedServletContainerFactory.java -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/DefaultTomcatServerCustomizer.java -text svneol=unset#text/plain
-spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/EmbeddedCatalinaConfiguration.java -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/TomcatCustomizer.java -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/config/embedded/CatalinaConfiguration.java -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/config/embedded/CatalinaDefaultContext.java -text svneol=unset#text/plain
