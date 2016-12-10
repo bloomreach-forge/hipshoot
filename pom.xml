@@ -17,7 +17,7 @@
   <description>hipshoot</description>
   <groupId>org.onehippo.forge.hipshoot</groupId>
   <artifactId>hipshoot</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <url>http://hipshoot.forge.onehippo.org/</url>
 
@@ -81,9 +81,9 @@
   </developers>
 
   <scm>
-    <connection>scm:svn:https://forge.onehippo.org/svn/hipshoot/tags/hipshoot-0.1.0</connection>
-    <developerConnection>scm:svn:https://forge.onehippo.org/svn/hipshoot/tags/hipshoot-0.1.0</developerConnection>
-    <url>https://forge.onehippo.org/svn/hipshoot/tags/hipshoot-0.1.0</url>
+    <connection>scm:svn:https://forge.onehippo.org/svn/hipshoot/trunk</connection>
+    <developerConnection>scm:svn:https://forge.onehippo.org/svn/hipshoot/trunk</developerConnection>
+    <url>https://forge.onehippo.org/svn/hipshoot/trunk</url>
   </scm>
 
   <issueManagement>
