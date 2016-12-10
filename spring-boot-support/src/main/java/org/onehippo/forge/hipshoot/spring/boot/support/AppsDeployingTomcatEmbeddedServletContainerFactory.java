@@ -38,6 +38,8 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.webresources.StandardRoot;
+import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer;
@@ -72,7 +74,7 @@ import org.springframework.util.StringUtils;
  *   </LI>
  * </UL>
  * <P>
- * Please see {@link EmbeddedCatalinaConfiguration} for a full list of the available properties.
+ * Please see {@link CatalinaConfiguration} for a full list of the available properties.
  * </P>
  */
 public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedServletContainerFactory {
@@ -102,20 +104,22 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
     /**
      * Embedded tomcat configuration.
      */
-    private final EmbeddedCatalinaConfiguration config;
+    private final CatalinaConfiguration catalinaConfiguration;
 
     /**
-     * Constructs with an {@link EmbeddedCatalinaConfiguration}.
-     * @param catalinaConfig {@link EmbeddedCatalinaConfiguration}
+     * Constructs with an {@link CatalinaConfiguration}.
+     * @param catalinaConfig {@link CatalinaConfiguration}
      */
-    public AppsDeployingTomcatEmbeddedServletContainerFactory(final EmbeddedCatalinaConfiguration catalinaConfig) {
+    public AppsDeployingTomcatEmbeddedServletContainerFactory(final CatalinaConfiguration catalinaConfig) {
         super();
 
-        this.config = catalinaConfig;
+        this.catalinaConfiguration = catalinaConfig;
 
-        setPersistSession(config.isPersistSession());
+        addTomcatCustomizer(new DefaultTomcatServerCustomizer());
 
-        final String appBase = config.getAppBase();
+        setPersistSession(catalinaConfiguration.isPersistSession());
+
+        final String appBase = catalinaConfiguration.getAppBase();
 
         if (appBase != null && !appBase.isEmpty()) {
             File appBaseDir = new File(appBase);
@@ -127,7 +131,7 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
             log.info("Embedded catalog appBase: {}", appBaseDir.getAbsolutePath());
             setAppBaseDirectory(appBaseDir);
 
-            extractEmbeddedWars(config);
+            extractEmbeddedWars(catalinaConfiguration);
         }
     }
 
@@ -135,7 +139,7 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
      * Add a {@link Tomcat} customizer.
      * @param tomcatCustomizer {@link Tomcat} customizer
      */
-    public void addTomcatCustomizers(TomcatCustomizer tomcatCustomizer) {
+    public void addTomcatCustomizer(TomcatCustomizer tomcatCustomizer) {
         tomcatCustomizers.add(tomcatCustomizer);
     }
 
@@ -148,12 +152,12 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
     @Override
     protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(Tomcat tomcat) {
         try {
-            for (TomcatCustomizer tomcatCustomizer : tomcatCustomizers) {
-                tomcatCustomizer.customize(tomcat);
+            if (catalinaConfiguration.isNamingEnabled()) {
+                tomcat.enableNaming();
             }
 
-            if (config.isNamingEnabled()) {
-                tomcat.enableNaming();
+            for (TomcatCustomizer tomcatCustomizer : tomcatCustomizers) {
+                tomcatCustomizer.customize(tomcat, catalinaConfiguration);
             }
 
             String contextPath;
@@ -169,14 +173,23 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
 
                 if (!isPersistSession()) {
                     manager = context.getManager();
+
                     if (manager == null) {
                         manager = new StandardManager();
                         context.setManager(manager);
                     }
+
                     if (manager instanceof StandardManager) {
                         ((StandardManager) manager).setPathname(null);
                     }
                 }
+
+                StandardRoot standardRoot = new StandardRoot(context);
+                standardRoot.setCachingAllowed(
+                        catalinaConfiguration.getServer().getDefaultContext().getResources().isCachingAllowed());
+                standardRoot.setCacheMaxSize(
+                        catalinaConfiguration.getServer().getDefaultContext().getResources().getCacheMaxSize());
+                context.setResources(standardRoot);
             }
         } catch (ServletException ex) {
             throw new IllegalStateException("Failed to add webapp", ex);
@@ -241,7 +254,7 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
         return webappPathsMap;
     }
 
-    private void extractEmbeddedWars(EmbeddedCatalinaConfiguration config) {
+    private void extractEmbeddedWars(CatalinaConfiguration config) {
         final String wars = config.getWars();
 
         if (wars != null && !wars.isEmpty()) {

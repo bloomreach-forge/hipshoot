@@ -14,21 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onehippo.forge.hipshoot.spring.boot.support;
+package org.onehippo.forge.hipshoot.spring.boot.support.config.embedded;
 
-import org.apache.catalina.startup.Tomcat;
-import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaConfiguration;
+public class CatalinaEnvironment {
 
-/**
- * Callback interface that can be used to customize a {@link Tomcat}.
- */
-public interface TomcatCustomizer {
+    private String name;
+    private String value;
 
-    /**
-     * Customize the {@link Tomcat} instance.
-     * @param tomcat the {@link Tomcat} instance to customize
-     * @param catalinaConfiguration embedded tomcat configuration
-     */
-    public void customize(final Tomcat tomcat, final CatalinaConfiguration catalinaConfiguration);
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 
 }
