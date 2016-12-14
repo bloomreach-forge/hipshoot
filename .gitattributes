@@ -17,4 +17,5 @@ spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/suppor
 src/site/site.xml -text
 src/site/xdoc/hipshoot-spring-boot-support/index.xml -text svneol=unset#text/plain
 src/site/xdoc/hipshoot-spring-boot-support/install.xml -text svneol=unset#text/plain
+src/site/xdoc/index.xml -text
 src/site/xdoc/release-notes.xml -text svneol=unset#text/plain
