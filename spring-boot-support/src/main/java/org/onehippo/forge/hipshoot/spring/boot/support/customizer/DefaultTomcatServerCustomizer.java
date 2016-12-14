@@ -14,27 +14,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onehippo.forge.hipshoot.spring.boot.support;
+package org.onehippo.forge.hipshoot.spring.boot.support.customizer;
 
 import java.util.Map;
 
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
+import org.onehippo.forge.hipshoot.spring.boot.support.TomcatCustomizer;
 import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaConfiguration;
+import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaEnvironment;
 import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaGlobalNamingResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class DefaultTomcatServerCustomizer implements TomcatCustomizer {
+/**
+ * Default embedded tomcat customizer implementation.
+ */
+public class DefaultTomcatServerCustomizer implements TomcatCustomizer {
 
     private static Logger log = LoggerFactory.getLogger(DefaultTomcatServerCustomizer.class);
 
-    @Override
-    public void customize(final Tomcat tomcat, final CatalinaConfiguration config) {
-        addGlobalNamingResources(tomcat, config);
+    private final CatalinaConfiguration catalinaConfig;
+
+    public DefaultTomcatServerCustomizer(final CatalinaConfiguration catalinaConfig) {
+        this.catalinaConfig = catalinaConfig;
     }
 
-    private void addGlobalNamingResources(final Tomcat tomcat, final CatalinaConfiguration config) {
+    @Override
+    public void customize(final Tomcat tomcat) {
+        addGlobalNamingEnvironments(tomcat);
+        addGlobalNamingResources(tomcat);
+    }
+
+    private void addGlobalNamingEnvironments(final Tomcat tomcat) {
+        String type;
+        String name;
+        String value;
+        ContextEnvironment environment;
+
+        for (CatalinaEnvironment envConf : catalinaConfig.getServer().getDefaultContext().getEnvironments()) {
+            type = envConf.getType();
+            name = envConf.getName();
+            value = envConf.getValue();
+
+            environment = new ContextEnvironment();
+            environment.setType(type);
+            environment.setName(name);
+            environment.setValue(value);
+
+            log.info("Adding global naming environment: type='{}', name='{}', value='{}'.", type, name, value);
+            tomcat.getServer().getGlobalNamingResources().addEnvironment(environment);
+        }
+    }
+
+    private void addGlobalNamingResources(final Tomcat tomcat) {
         String name;
         String auth;
         String type;
@@ -42,7 +76,7 @@ class DefaultTomcatServerCustomizer implements TomcatCustomizer {
         String propName;
         Object propValue;
 
-        for (CatalinaGlobalNamingResource resConf : config.getServer().getGlobalNamingResources()) {
+        for (CatalinaGlobalNamingResource resConf : catalinaConfig.getServer().getGlobalNamingResources()) {
             name = resConf.getName();
             auth = resConf.getAuth();
             type = resConf.getType();

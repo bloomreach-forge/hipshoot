@@ -34,6 +34,13 @@
       </table>
     </section>
     <section name="Release Notes">
+      <subsection name="0.1.1">
+        <ul>
+          <li>Bug fix to registering global naming environments, resources and default context parameters.</li>
+          <li>Always enable JNDI naming option.</li>
+          <li>Code clean ups.</li>
+        </ul>
+      </subsection>
       <subsection name="0.1.0">
         <ul>
           <li>Initial release with Spring Boot support/extension components.</li>

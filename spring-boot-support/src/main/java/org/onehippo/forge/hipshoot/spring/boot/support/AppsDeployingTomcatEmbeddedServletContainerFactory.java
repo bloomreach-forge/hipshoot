@@ -25,9 +25,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +41,11 @@ import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.StandardRoot;
 import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaConfiguration;
+import org.onehippo.forge.hipshoot.spring.boot.support.customizer.DefaultTomcatContextCustomizer;
+import org.onehippo.forge.hipshoot.spring.boot.support.customizer.DefaultTomcatServerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.util.StringUtils;
@@ -99,7 +103,7 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
     /**
      * {@link Tomcat} customizers.
      */
-    private List<TomcatCustomizer> tomcatCustomizers = new ArrayList<>();
+    private List<TomcatCustomizer> tomcatCustomizers = new LinkedList<>();
 
     /**
      * Embedded tomcat configuration.
@@ -115,7 +119,8 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
 
         this.catalinaConfiguration = catalinaConfig;
 
-        addTomcatCustomizer(new DefaultTomcatServerCustomizer());
+        addTomcatCustomizers(new DefaultTomcatServerCustomizer(catalinaConfig));
+        addContextCustomizers(new DefaultTomcatContextCustomizer(catalinaConfig));
 
         setPersistSession(catalinaConfiguration.isPersistSession());
 
@@ -136,11 +141,15 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
     }
 
     /**
-     * Add a {@link Tomcat} customizer.
-     * @param tomcatCustomizer {@link Tomcat} customizer
+     * Add {@link Tomcat} customizer(s).
+     * @param customizers {@link Tomcat} customizer(s)
      */
-    public void addTomcatCustomizer(TomcatCustomizer tomcatCustomizer) {
-        tomcatCustomizers.add(tomcatCustomizer);
+    public void addTomcatCustomizers(TomcatCustomizer ... customizers) {
+        if (tomcatCustomizers != null) {
+            for (TomcatCustomizer customizer : customizers) {
+                tomcatCustomizers.add(customizer);
+            }
+        }
     }
 
     /**
@@ -152,13 +161,13 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
     @Override
     protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(Tomcat tomcat) {
         try {
-            if (catalinaConfiguration.isNamingEnabled()) {
-                tomcat.enableNaming();
-            }
+            tomcat.enableNaming();
 
             for (TomcatCustomizer tomcatCustomizer : tomcatCustomizers) {
-                tomcatCustomizer.customize(tomcat, catalinaConfiguration);
+                tomcatCustomizer.customize(tomcat);
             }
+
+            final Collection<TomcatContextCustomizer> contextCustomizers = getTomcatContextCustomizers();
 
             String contextPath;
             String basePath;
@@ -190,6 +199,12 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
                 standardRoot.setCacheMaxSize(
                         catalinaConfiguration.getServer().getDefaultContext().getResources().getCacheMaxSize());
                 context.setResources(standardRoot);
+
+                if (contextCustomizers != null) {
+                    for (TomcatContextCustomizer contextCustomizer : contextCustomizers) {
+                        contextCustomizer.customize(context);
+                    }
+                }
             }
         } catch (ServletException ex) {
             throw new IllegalStateException("Failed to add webapp", ex);

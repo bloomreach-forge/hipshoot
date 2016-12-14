@@ -17,7 +17,6 @@
 package org.onehippo.forge.hipshoot.spring.boot.support;
 
 import org.apache.catalina.startup.Tomcat;
-import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaConfiguration;
 
 /**
  * Callback interface that can be used to customize a {@link Tomcat}.
@@ -27,8 +26,7 @@ public interface TomcatCustomizer {
     /**
      * Customize the {@link Tomcat} instance.
      * @param tomcat the {@link Tomcat} instance to customize
-     * @param catalinaConfiguration embedded tomcat configuration
      */
-    public void customize(final Tomcat tomcat, final CatalinaConfiguration catalinaConfiguration);
+    public void customize(final Tomcat tomcat);
 
 }

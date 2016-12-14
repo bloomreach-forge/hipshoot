@@ -2,7 +2,6 @@
 /pom.xml -text
 spring-boot-support/pom.xml -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/AppsDeployingTomcatEmbeddedServletContainerFactory.java -text svneol=unset#text/plain
-spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/DefaultTomcatServerCustomizer.java -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/TomcatCustomizer.java -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/config/embedded/CatalinaConfiguration.java -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/config/embedded/CatalinaDefaultContext.java -text svneol=unset#text/plain
@@ -12,6 +11,9 @@ spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/suppor
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/config/embedded/CatalinaParameter.java -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/config/embedded/CatalinaResources.java -text svneol=unset#text/plain
 spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/config/embedded/CatalinaServer.java -text svneol=unset#text/plain
+spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/customizer/DefaultTomcatContextCustomizer.java -text svneol=unset#text/plain
+spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/customizer/DefaultTomcatServerCustomizer.java -text svneol=unset#text/plain
+spring-boot-support/src/main/java/org/onehippo/forge/hipshoot/spring/boot/support/util/EmbeddedTomcatUtils.java -text svneol=unset#text/plain
 src/site/site.xml -text
 src/site/xdoc/hipshoot-spring-boot-support/index.xml -text svneol=unset#text/plain
 src/site/xdoc/hipshoot-spring-boot-support/install.xml -text svneol=unset#text/plain
