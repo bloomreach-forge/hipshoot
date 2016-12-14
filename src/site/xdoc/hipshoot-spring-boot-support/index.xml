@@ -402,6 +402,11 @@ $ java \
         ]]></source>
         </div>
       </subsection>
+      <subsection name="Demo Project(s)">
+        <ul>
+          <li><a href="https://github.com/woonsanko/hippo-on-spring-boot">https://github.com/woonsanko/hippo-on-spring-boot</a></li>
+        </ul>
+      </subsection>
     </section>
   </body>
 </document>
