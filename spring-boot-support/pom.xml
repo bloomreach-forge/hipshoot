@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.onehippo.forge.hipshoot</groupId>
     <artifactId>hipshoot</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.1</version>
   </parent>
 
   <name>hipshoot Spring Boot Support</name>
