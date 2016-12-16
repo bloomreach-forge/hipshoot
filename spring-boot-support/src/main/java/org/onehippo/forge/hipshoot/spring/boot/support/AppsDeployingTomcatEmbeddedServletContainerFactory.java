@@ -42,7 +42,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.StandardRoot;
 import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaConfiguration;
 import org.onehippo.forge.hipshoot.spring.boot.support.customizer.DefaultTomcatContextCustomizer;
-import org.onehippo.forge.hipshoot.spring.boot.support.customizer.DefaultTomcatServerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatContextCustomizer;
@@ -119,7 +118,6 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
 
         this.catalinaConfiguration = catalinaConfig;
 
-        addTomcatCustomizers(new DefaultTomcatServerCustomizer(catalinaConfig));
         addContextCustomizers(new DefaultTomcatContextCustomizer(catalinaConfig));
 
         setPersistSession(catalinaConfiguration.isPersistSession());

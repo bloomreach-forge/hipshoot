@@ -34,6 +34,11 @@
       </table>
     </section>
     <section name="Release Notes">
+      <subsection name="0.1.2">
+        <ul>
+          <li>Bug fix to register a default context naming resource in each web application context.</li>
+        </ul>
+      </subsection>
       <subsection name="0.1.1">
         <ul>
           <li>Bug fix to registering global naming environments, resources and default context parameters.</li>

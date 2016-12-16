@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
-public class CatalinaGlobalNamingResource {
+public class CatalinaNamingResource {
 
     private String name;
     private String auth;

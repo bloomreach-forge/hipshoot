@@ -19,12 +19,13 @@ package org.onehippo.forge.hipshoot.spring.boot.support.config.embedded;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CatalinaDefaultContext {
+public class CatalinaContext {
 
     private CatalinaManager manager = new CatalinaManager();
     private CatalinaResources resources = new CatalinaResources();
     private List<CatalinaParameter> parameters = new ArrayList<>();
     private List<CatalinaEnvironment> environments = new ArrayList<>();
+    private List<CatalinaNamingResource> namingResources = new ArrayList<>();
 
     public CatalinaManager getManager() {
         return manager;
@@ -56,6 +57,14 @@ public class CatalinaDefaultContext {
 
     public void setEnvironments(List<CatalinaEnvironment> environments) {
         this.environments = environments;
+    }
+
+    public List<CatalinaNamingResource> getNamingResources() {
+        return namingResources;
+    }
+
+    public void setNamingResources(List<CatalinaNamingResource> namingResources) {
+        this.namingResources = namingResources;
     }
 
 }

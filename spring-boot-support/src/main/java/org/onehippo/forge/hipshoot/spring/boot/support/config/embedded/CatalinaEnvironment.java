@@ -21,6 +21,7 @@ public class CatalinaEnvironment {
     private String name;
     private String value;
     private String type;
+    private boolean override;
 
     public String getName() {
         return name;
@@ -44,6 +45,14 @@ public class CatalinaEnvironment {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public boolean isOverride() {
+        return override;
+    }
+
+    public void setOverride(boolean override) {
+        this.override = override;
     }
 
 }

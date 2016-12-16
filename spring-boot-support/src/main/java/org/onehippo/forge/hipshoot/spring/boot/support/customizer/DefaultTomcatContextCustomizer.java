@@ -16,14 +16,16 @@
  */
 package org.onehippo.forge.hipshoot.spring.boot.support.customizer;
 
+import java.util.Map;
+
 import org.apache.catalina.Context;
-import org.apache.catalina.Server;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
 import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaConfiguration;
+import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaEnvironment;
+import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaNamingResource;
 import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaParameter;
-import org.onehippo.forge.hipshoot.spring.boot.support.util.EmbeddedTomcatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatContextCustomizer;
@@ -43,67 +45,69 @@ public class DefaultTomcatContextCustomizer implements TomcatContextCustomizer {
 
     @Override
     public void customize(final Context context) {
-        bindGlobalContextParameters(context);
-        bindGlobalNamingEnvironments(context);
-        bindGlobalNamingResources(context);
+        addDefaultContextApplicationParameters(context);
+        addDefaultContextNamingEnvironments(context);
+        addDefaultContextNamingResources(context);
     }
 
-    private void bindGlobalContextParameters(final Context context) {
-        final Server server = EmbeddedTomcatUtils.getServer(context);
+    private void addDefaultContextApplicationParameters(final Context context) {
+        ApplicationParameter appParam;
 
-        if (server != null) {
-            String name;
-            String value;
-            boolean override;
-            ApplicationParameter appParam;
+        for (CatalinaParameter param : catalinaConfig.getServer().getDefaultContext().getParameters()) {
+            appParam = new ApplicationParameter();
+            appParam.setName(param.getName());
+            appParam.setValue(param.getValue());
+            appParam.setOverride(param.isOverride());
 
-            for (CatalinaParameter param : catalinaConfig.getServer().getDefaultContext().getParameters()) {
-                name = param.getName();
-                value = param.getValue();
-                override = param.isOverride();
-                appParam = new ApplicationParameter();
-                appParam.setName(name);
-                appParam.setValue(value);
-                appParam.setOverride(override);
-                context.addApplicationParameter(appParam);
-                log.info("Binding global context application parameter, {}, in context ('{}').", appParam,
-                        context.getPath());
+            log.info("Adding default context application parameter, {}, in context ('{}').", appParam,
+                    context.getPath());
+            context.addApplicationParameter(appParam);
+        }
+    }
+
+    private void addDefaultContextNamingEnvironments(final Context context) {
+        ContextEnvironment environment;
+        ContextEnvironment existingContextEnvironment;
+
+        for (CatalinaEnvironment envConf : catalinaConfig.getServer().getDefaultContext().getEnvironments()) {
+            existingContextEnvironment = context.getNamingResources().findEnvironment(envConf.getName());
+
+            if (!envConf.isOverride() || existingContextEnvironment == null) {
+                environment = new ContextEnvironment();
+                environment.setType(envConf.getType());
+                environment.setName(envConf.getName());
+                environment.setValue(envConf.getValue());
+
+                log.info("Adding default context naming environment: name='{}', type='{}', in context ('{}').",
+                        envConf.getName(), envConf.getType(), context.getPath());
+                context.getNamingResources().addEnvironment(environment);
             }
         }
     }
 
-    private void bindGlobalNamingEnvironments(final Context context) {
-        final Server server = EmbeddedTomcatUtils.getServer(context);
+    private void addDefaultContextNamingResources(final Context context) {
+        Map<String, Object> props;
+        String propName;
+        Object propValue;
 
-        if (server != null) {
-            ContextEnvironment[] contextEnvironments = server.getGlobalNamingResources().findEnvironments();
-            boolean override;
-            ContextEnvironment existingContextEnvironment;
+        for (CatalinaNamingResource resConf : catalinaConfig.getServer().getDefaultContext().getNamingResources()) {
+            ContextResource resource = new ContextResource();
 
-            for (ContextEnvironment contextEnvironment : contextEnvironments) {
-                override = contextEnvironment.getOverride();
-                existingContextEnvironment = context.getNamingResources().findEnvironment(contextEnvironment.getName());
+            resource.setName(resConf.getName());
+            resource.setAuth(resConf.getAuth());
+            resource.setType(resConf.getType());
 
-                if (!override || existingContextEnvironment == null) {
-                    context.getNamingResources().addEnvironment(contextEnvironment);
-                    log.info("Binding global context environment, '{}', in context ('{}').",
-                            contextEnvironment.getName(), context.getPath());
-                }
+            props = resConf.getProperties();
+
+            for (Map.Entry<String, Object> prop : props.entrySet()) {
+                propName = prop.getKey();
+                propValue = prop.getValue();
+                resource.setProperty(propName, propValue);
             }
-        }
-    }
 
-    private void bindGlobalNamingResources(final Context context) {
-        final Server server = EmbeddedTomcatUtils.getServer(context);
-
-        if (server != null) {
-            ContextResource[] contextResources = server.getGlobalNamingResources().findResources();
-
-            for (ContextResource contextResource : contextResources) {
-                context.getNamingResources().addResource(contextResource);
-                log.info("Binding global context resource, '{}', in context ('{}').", contextResource.getName(),
-                        context.getPath());
-            }
+            log.info("Adding default context naming resource: name='{}', type='{}', in context ('{}').",
+                    resConf.getName(), resConf.getType(), context.getPath());
+            context.getNamingResources().addResource(resource);
         }
     }
 }

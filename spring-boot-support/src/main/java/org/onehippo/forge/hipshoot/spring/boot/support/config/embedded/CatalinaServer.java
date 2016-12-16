@@ -16,28 +16,16 @@
  */
 package org.onehippo.forge.hipshoot.spring.boot.support.config.embedded;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CatalinaServer {
 
-    private CatalinaDefaultContext defaultContext = new CatalinaDefaultContext();
-    private List<CatalinaGlobalNamingResource> globalNamingResources = new ArrayList<>();
+    private CatalinaContext defaultContext = new CatalinaContext();
 
-    public CatalinaDefaultContext getDefaultContext() {
+    public CatalinaContext getDefaultContext() {
         return defaultContext;
     }
 
-    public void setDefaultContext(CatalinaDefaultContext defaultContext) {
+    public void setDefaultContext(CatalinaContext defaultContext) {
         this.defaultContext = defaultContext;
-    }
-
-    public List<CatalinaGlobalNamingResource> getGlobalNamingResources() {
-        return globalNamingResources;
-    }
-
-    public void setGlobalNamingResources(List<CatalinaGlobalNamingResource> globalNamingResources) {
-        this.globalNamingResources = globalNamingResources;
     }
 
 }
