@@ -158,13 +158,36 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
      */
     @Override
     protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(Tomcat tomcat) {
+        tomcat.enableNaming();
+
+        for (TomcatCustomizer tomcatCustomizer : tomcatCustomizers) {
+            tomcatCustomizer.customize(tomcat);
+        }
+
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        addWebApplications(tomcat, contextClassLoader);
+
+        return super.getTomcatEmbeddedServletContainer(tomcat);
+    }
+
+    /**
+     * Returns web application base directory (i.e, webapps directory) of the embedded tomcat.
+     * @return web application base directory (i.e, webapps directory) of the embedded tomcat
+     */
+    protected File getAppBaseDirectory() {
+        return appBaseDirectory;
+    }
+
+    /**
+     * Sets web application base directory (i.e, webapps directory) of the embedded tomcat.
+     * @param appBaseDirectory web application base directory (i.e, webapps directory) of the embedded tomcat
+     */
+    protected void setAppBaseDirectory(File appBaseDirectory) {
+        this.appBaseDirectory = appBaseDirectory;
+    }
+
+    private void addWebApplications(final Tomcat tomcat, final ClassLoader parentClassLoader) {
         try {
-            tomcat.enableNaming();
-
-            for (TomcatCustomizer tomcatCustomizer : tomcatCustomizers) {
-                tomcatCustomizer.customize(tomcat);
-            }
-
             final Collection<TomcatContextCustomizer> contextCustomizers = getTomcatContextCustomizers();
 
             String contextPath;
@@ -175,7 +198,7 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
                 contextPath = entry.getKey();
                 basePath = entry.getValue();
                 Context context = tomcat.addWebapp(contextPath, basePath);
-                WebappLoader webappLoader = new WebappLoader(Thread.currentThread().getContextClassLoader());
+                WebappLoader webappLoader = new WebappLoader(parentClassLoader);
                 context.setLoader(webappLoader);
 
                 if (!isPersistSession()) {
@@ -207,24 +230,6 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
         } catch (ServletException ex) {
             throw new IllegalStateException("Failed to add webapp", ex);
         }
-
-        return super.getTomcatEmbeddedServletContainer(tomcat);
-    }
-
-    /**
-     * Returns web application base directory (i.e, webapps directory) of the embedded tomcat.
-     * @return web application base directory (i.e, webapps directory) of the embedded tomcat
-     */
-    protected File getAppBaseDirectory() {
-        return appBaseDirectory;
-    }
-
-    /**
-     * Sets web application base directory (i.e, webapps directory) of the embedded tomcat.
-     * @param appBaseDirectory web application base directory (i.e, webapps directory) of the embedded tomcat
-     */
-    protected void setAppBaseDirectory(File appBaseDirectory) {
-        this.appBaseDirectory = appBaseDirectory;
     }
 
     private Map<String, String> getWebappPathsMap() {
