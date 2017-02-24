@@ -54,6 +54,29 @@
               </p>
             </td>
           </tr>
+          <tr>
+            <td><a href="../../apidocs/org/onehippo/forge/hipshoot/spring/boot/support/servlet/DeferredInitDelegatingServlet.html">DeferredInitDelegatingServlet</a></td>
+            <td>
+              <p>
+                Delegating Servlet that defers the initialization of the delegate servlet and delegates calls to the delegate servlet
+                specified in the init parameter, <code>DeferredInitDelegatingServlet.delegateServletClass</code>.
+              </p>
+              <p>
+                This delegating servlet with 'deferring initialization' feature can be useful if you want to start
+                a web application fast enough without waiting for a servlet initialization to complete.
+                For example, when you deploy spring boot based web application(s) onto a cloud based platform,
+                you don't have to worry about the timeout issue (e.g, 60 seconds by default somewhere) due to a long
+                time initializing servlet with this class.
+                This servlet class will pass the servlet initialization phase fast because the real initialization
+                of the delegate servlet will be deferred and done asynchronously so that the servlet container may start all
+                the other web applications faster without having to wait for the delegate servlet to complete the initialization phase.
+              </p>
+              <p>
+                Please see <a href="../../apidocs/org/onehippo/forge/hipshoot/spring/boot/support/servlet/DeferredInitDelegatingServlet.html">DeferredInitDelegatingServlet</a>
+                for usages and details.
+              </p>
+            </td>
+          </tr>
         </table>
       </subsection>
       <subsection name="About AppsDeployingTomcatEmbeddedServletContainerFactory">

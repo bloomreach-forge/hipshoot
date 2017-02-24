@@ -291,16 +291,18 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
                         BufferedInputStream bis = null;
                         OutputStream os = null;
                         BufferedOutputStream bos = null;
+                        File webappDir = null;
 
                         try {
                             is = warRes.openStream();
                             bis = new BufferedInputStream(is);
-                            os = new FileOutputStream(new File(getAppBaseDirectory(), warName));
+                            webappDir = new File(getAppBaseDirectory(), warName);
+                            os = new FileOutputStream(webappDir);
                             bos = new BufferedOutputStream(os);
                             copy(bis, bos);
-                            log.info("Deployed embedded war, {}.", warName);
+                            log.info("Extracted embedded war from {} to {}.", warRes, webappDir);
                         } catch (IOException e) {
-                            log.error("Failed to copy {} to {}.", warName, getAppBaseDirectory(), e);
+                            log.error("Failed to extract embedded war from {} to {}.", warRes, webappDir, e);
                         } finally {
                             closeQuietly(bos);
                             closeQuietly(os);

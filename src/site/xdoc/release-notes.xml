@@ -34,6 +34,11 @@
       </table>
     </section>
     <section name="Release Notes">
+      <subsection name="0.1.3">
+        <ul>
+          <li>Adding Deferred initializing delegating servlet for servlets that takes much time to initialize for faster startup.</li>
+        </ul>
+      </subsection>
       <subsection name="0.1.2">
         <ul>
           <li>Bug fix to register a default context naming resource in each web application context.</li>
