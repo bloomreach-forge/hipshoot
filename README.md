@@ -35,4 +35,4 @@ In pom.xml
 ## OLD SVN TODO
 
 - first remove all docs, just one page pointing to the new docs (above)
-- remove trunk content and add README.txt with "Moved to https://github.com/onehippo-forge/REPO_NAME"
+- remove trunk content and add README.txt with "Moved to https://github.com/onehippo-forge/hipshoot"
