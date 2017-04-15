@@ -8,7 +8,7 @@ For example, [Spring Boot](https://projects.spring.io/spring-boot/) project prov
 This project has declared the following modules:
 
 | Module | Description |
-|:------:|:-----------:|
+| ------ | ----------- |
 | hipshoot Spring Boot Support | Spring Boot Support/Extension Library, providing components to support or extend Spring Boot Framework. | 
 
 # Documentation 
