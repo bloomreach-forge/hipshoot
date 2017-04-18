@@ -26,8 +26,3 @@ The output is in the docs directory; push it and GitHub Pages will serve the sit
 
 - [https://github.com/woonsanko/hippo-on-spring-boot](https://github.com/woonsanko/hippo-on-spring-boot)
 
-
-## OLD SVN TODO
-
-- first remove all docs, just one page pointing to the new docs (above)
-- remove trunk content and add README.txt with "Moved to https://github.com/onehippo-forge/hipshoot"
