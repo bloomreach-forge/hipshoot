@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/onehippo-forge/hipshoot.svg?branch=develop)](https://travis-ci.org/onehippo-forge/hipshoot)
 
 # hipshoot
 
