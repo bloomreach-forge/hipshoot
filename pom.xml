@@ -28,7 +28,7 @@
 
     <spring-boot.version>1.4.2.RELEASE</spring-boot.version>
     <servlet-api.version>3.0.1</servlet-api.version>
-    <tomcat-embed.version>8.5.4</tomcat-embed.version>
+    <tomcat-embed.version>8.5.34</tomcat-embed.version>
 
     <lib.junit.version>4.8.2</lib.junit.version>
     <lib.easymock.version>3.0</lib.easymock.version>
