@@ -19,7 +19,7 @@
   <artifactId>hipshoot</artifactId>
   <version>0.1.4-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <url>https://onehippo-forge.github.io/hipshoot</url>
+  <url>https://bloomreach-forge.github.io/hipshoot</url>
 
   <properties>
 
@@ -79,9 +79,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:onehippo-forge/hipshoot.git</connection>
-    <developerConnection>scm:git:git@github.com:onehippo-forge/hipshoot.git</developerConnection>
-    <url>https://github.com/onehippo-forge/hipshoot</url>
+    <connection>scm:git:git@github.com:bloomreach-forge/hipshoot.git</connection>
+    <developerConnection>scm:git:git@github.com:bloomreach-forge/hipshoot.git</developerConnection>
+    <url>https://github.com/bloomreach-forge/hipshoot</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -92,7 +92,7 @@
 
   <ciManagement>
     <system>Travis CI</system>
-    <url>https://travis-ci.org/onehippo-forge/hipshoot</url>
+    <url>https://travis-ci.org/bloomreach-forge/hipshoot</url>
   </ciManagement>
 
   <distributionManagement>
