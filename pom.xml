@@ -17,7 +17,7 @@
   <description>Simple Component Support/Extension Libraries for Cloud-friendly Frameworks such as Spring Boot</description>
   <groupId>org.onehippo.forge.hipshoot</groupId>
   <artifactId>hipshoot</artifactId>
-  <version>0.1.4-SNAPSHOT</version>
+  <version>0.1.4</version>
   <packaging>pom</packaging>
   <url>https://bloomreach-forge.github.io/hipshoot</url>
 
@@ -28,7 +28,7 @@
 
     <spring-boot.version>1.4.2.RELEASE</spring-boot.version>
     <servlet-api.version>3.0.1</servlet-api.version>
-    <tomcat-embed.version>8.5.4</tomcat-embed.version>
+    <tomcat-embed.version>8.5.34</tomcat-embed.version>
 
     <lib.junit.version>4.8.2</lib.junit.version>
     <lib.easymock.version>3.0</lib.easymock.version>
@@ -297,9 +297,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>${plugin.site.version}</version>
-        <configuration>
-          <outputDirectory>docs</outputDirectory>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -323,5 +320,23 @@
     </plugins>
 
   </build>
+
+  <profiles>
+    <profile>
+      <!-- For generating/publishing GitHub Site Pages into /docs/ folder on master branch only -->
+      <id>github.pages</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-site-plugin</artifactId>
+            <configuration>
+              <outputDirectory>docs</outputDirectory>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

@@ -32,8 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.Manager;
 import org.apache.catalina.loader.WebappLoader;
@@ -227,7 +225,7 @@ public class AppsDeployingTomcatEmbeddedServletContainerFactory extends TomcatEm
                     }
                 }
             }
-        } catch (ServletException ex) {
+        } catch (Exception ex) {
             throw new IllegalStateException("Failed to add webapp", ex);
         }
     }
