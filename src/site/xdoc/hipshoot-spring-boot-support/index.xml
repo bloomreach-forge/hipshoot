@@ -34,10 +34,16 @@
             <th>Description</th>
           </tr>
           <tr>
-            <td><a href="../apidocs/org/onehippo/forge/hipshoot/spring/boot/support/AppsDeployingTomcatEmbeddedServletContainerFactory.html">AppsDeployingTomcatEmbeddedServletContainerFactory</a></td>
+            <td>
+              Either
+              <a href="../apidocs/org/onehippo/forge/hipshoot/spring/boot/support/AppsDeployingTomcatServletWebServerFactory.html">AppsDeployingTomcatServletWebServerFactory</a>
+              in v2.x, or
+              <a href="../apidocs/org/onehippo/forge/hipshoot/spring/boot/support/AppsDeployingTomcatEmbeddedServletContainerFactory.html">AppsDeployingTomcatEmbeddedServletContainerFactory</a>
+              in the earlier versions.
+            </td>
             <td>
               <p>
-                An extension of <a href="http://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/embedded/tomcat/TomcatEmbeddedServletContainerFactory.html">TomcatEmbeddedServletContainerFactory</a>
+                An extension of the Tomcat web server factory,
                 to be able to deploy additional WARs packaged at <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>.
               </p>
               <p>
@@ -79,9 +85,9 @@
           </tr>
         </table>
       </subsection>
-      <subsection name="About AppsDeployingTomcatEmbeddedServletContainerFactory">
+      <subsection name="About AppsDeployingTomcatServletWebServerFactory in v2.x or AppsDeployingTomcatEmbeddedServletContainerFactory in the earlier versions">
         <p>
-          By default, <a href="http://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/embedded/tomcat/TomcatEmbeddedServletContainerFactory.html">TomcatEmbeddedServletContainerFactory</a>
+          By default, the Tomcat web server container factory implementation
           does not provide some options to customize the embedded Tomcat server.
           For example, it doesn't allow to deploy additional web applications. It starts up only with single web applicaiton, by default.
           You are supposed to code somethings to customize the embedded Tomcat server manually in many cases.
@@ -90,15 +96,43 @@
           are deployed in most cases.
         </p>
         <p>
-          <a href="../apidocs/org/onehippo/forge/hipshoot/spring/boot/support/AppsDeployingTomcatEmbeddedServletContainerFactory.html">AppsDeployingTomcatEmbeddedServletContainerFactory</a>
-          extends <a href="http://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/embedded/tomcat/TomcatEmbeddedServletContainerFactory.html">TomcatEmbeddedServletContainerFactory</a>
-          to customize the embedded Tomcat server by following the recommendation in Spring Boot online documentation:
-          <a href="http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-developing-web-applications.html#boot-features-customizing-configurableembeddedservletcontainerfactory-directly">Customizing ConfigurableEmbeddedServletContainer directly</a>.
+          Either class extends the default Tomcat web server container factory class
+          to customize the embedded Tomcat container.
         </p>
       </subsection>
-      <subsection name="How to use AppsDeployingTomcatEmbeddedServletContainerFactory">
+      <subsection name="How to use AppsDeployingTomcatServletWebServerFactory in v2.x or AppsDeployingTomcatEmbeddedServletContainerFactory in the earlier versions">
         <p>
-          Here's a simple Spring Boot Application class example:
+          Here's a simple Spring Boot Application class example with v2.x:
+        </p>
+        <div class="brush: java">
+        <source><![CDATA[
+@Configuration
+@SpringBootApplication
+// To auto-scan org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaConfiguration bean
+// that reads all the configuration properties (from application.yaml or application.properties for example).
+@ComponentScan(basePackages = { "org.onehippo.forge.hipshoot.spring.boot.support.config.embedded" })
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+    /**
+     * Embedded tomcat configuration to pass to AppsDeployingTomcatEmbeddedServletContainerFactory
+     */
+    @Autowired
+    private CatalinaConfiguration catalinaConfiguration;
+
+    @Bean
+    public ServletWebServerFactory servletContainer() {
+        // Instead of TomcatServletWebServerFactory, return an AppsDeployingTomcatServletWebServerFactory here.
+        return new AppsDeployingTomcatServletWebServerFactory(catalinaConfiguration);
+    }
+}
+        ]]></source>
+        </div>
+        <p>
+          The following is a simple Spring Boot Application class example with the earlier versions:
         </p>
         <div class="brush: java">
         <source><![CDATA[
@@ -128,11 +162,7 @@ public class Application {
         ]]></source>
         </div>
         <p>
-          The <code>#servletContainerFactory()</code> method simply follows the customization example explained in the section,
-          <a href="http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-developing-web-applications.html#boot-features-customizing-configurableembeddedservletcontainerfactory-directly">Customizing ConfigurableEmbeddedServletContainer directly</a>.
-        </p>
-        <p>
-          Now, <code>AppsDeployingTomcatEmbeddedServletContainerFactory</code> will read all the configuration properties
+          Now, either of those will read all the configuration properties
           under <code>hipshoot.embedded.catalina</code> prefix (see the example configuration below),
           and do some extra work such as deploying additional wars as separate contexts,
           enabling JNDI naming, registering JNDI resources, etc.
@@ -206,7 +236,9 @@ hipshoot:
       </subsection>
       <subsection name="Deploying Additional WARs packages in the single executable JAR">
         <p>
-          <code>AppsDeployingTomcatEmbeddedServletContainerFactory</code> reads <code>hipshoot.embedded.catalina.wars</code>
+          <code>AppsDeployingTomcatServletWebServerFactory</code> in v2.x or
+          <code>AppsDeployingTomcatEmbeddedServletContainerFactory</code> in the earlier versions
+          reads <code>hipshoot.embedded.catalina.wars</code>
           configuration property. And, if the property has a comma separated war file resource names
           (e.g, <code>"site.war, cms.war"</code>), then it copies each war file resource from the single executable JAR file
           (under <code>classpath:META-INF/hipshoot/embedded-catalina/webapps/</code>)
@@ -258,21 +290,20 @@ hipshoot:
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.example</groupId>
-    <artifactId>myhippoproject</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <groupId>com.github.woonsanko</groupId>
+    <artifactId>hippo-on-spring-boot</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>myhippoproject-spring-boot-deploy</artifactId>
+  <artifactId>hippo-on-spring-boot-spring-boot-deploy</artifactId>
   <packaging>jar</packaging>
-  <name>My Hippo Project Spring Boot Deploy</name>
-  <description>My Hippo Project Spring Boot Deploy</description>
+  <name>Example Hippo On Spring Boot Spring Boot Deploy</name>
+  <description>Example Hippo On Spring Boot Spring Boot Deploy</description>
 
   <properties>
     <java.version>1.8</java.version>
-    <spring-boot.version>1.4.2.RELEASE</spring-boot.version>
-    <tomcat.version>8.5.6</tomcat.version>
-    <forge.hipshoot.version>0.1.0</forge.hipshoot.version>
+    <spring-boot.version>2.1.0.RELEASE</spring-boot.version>
+    <tomcat.version>9.0.12</tomcat.version>
   </properties>
 
   <dependencyManagement>
@@ -293,6 +324,12 @@ hipshoot:
   </dependencyManagement>
 
   <dependencies>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <!-- Let this application be a spring boot web application simply. -->
     <dependency>
@@ -315,17 +352,17 @@ hipshoot:
       <scope>provided</scope>
     </dependency>
 
-    <!-- Just for testing JNDI DataSource creation. -->
+    <!-- JDBC Driver for JNDI DataSource -->
     <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- To use Spring Boot Extension components provided by hipshoot-spring-boot-support. -->
     <dependency>
       <groupId>org.onehippo.forge.hipshoot</groupId>
       <artifactId>hipshoot-spring-boot-support</artifactId>
-      <version>${forge.hipshoot.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -344,8 +381,6 @@ hipshoot:
   </dependencies>
 
   <build>
-
-    <finalName>myhippoproject-spring-boot-deploy</finalName>
 
     <plugins>
 
@@ -370,7 +405,7 @@ hipshoot:
                 </resource>
                 <resource>
                   <filtering>false</filtering>
-                  <directory>${basedir}/../site/target</directory>
+                  <directory>${basedir}/../site/webapp/target</directory>
                   <includes>
                     <include>*.war</include>
                   </includes>
@@ -384,6 +419,7 @@ hipshoot:
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring-boot.version}</version>
         <configuration>
           <layout>ZIP</layout>
           <executable>true</executable>

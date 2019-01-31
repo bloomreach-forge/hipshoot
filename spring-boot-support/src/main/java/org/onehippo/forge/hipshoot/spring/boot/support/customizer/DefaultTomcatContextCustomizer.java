@@ -28,7 +28,7 @@ import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaN
 import org.onehippo.forge.hipshoot.spring.boot.support.config.embedded.CatalinaParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatContextCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 
 /**
  * Default {@link Context} customizer implementation.
