@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright 2016 Hippo
+  Copyright 2016-2019 Hippo
 
   Licensed under the Apache License, Version 2.0
   (the "License"); you may not use this file except in compliance with the
@@ -200,16 +200,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
         <version>${plugin.jxr.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-pmd-plugin</artifactId>
-        <version>${plugin.pmd.version}</version>
-        <configuration>
-          <linkXref>true</linkXref>
-          <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
-          <targetJdk>${project.build.javaVersion}</targetJdk>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
